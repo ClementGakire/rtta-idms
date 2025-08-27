@@ -3,8 +3,16 @@
 @section('content')
 <div class="container" style="padding-top: 80px;">
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-8">
       <h3>User Sessions</h3>
+    </div>
+    <div class="col-md-4 text-right">
+      <div class="form-inline" style="justify-content: flex-end;">
+        <label for="min" class="mr-2" style="color: #6c757d;">From</label>
+        <input id="min" type="text" class="form-control form-control-sm min mr-2" autocomplete="off">
+        <label for="max" class="mr-2" style="color: #6c757d;">To</label>
+        <input id="max" type="text" class="form-control form-control-sm" autocomplete="off">
+      </div>
     </div>
   </div>
 
@@ -31,17 +39,75 @@
 </div>
 @endsection
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.8/js/mdb.min.js"></script>
-    <script src="script.js"></script>
-
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.flash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script>
     <script>
-      $(document).ready(function() {
-        $('#sessions-table').DataTable({
-          "order": [[0, "desc"]]
+      $(document).ready(function(){
+        $.fn.dataTable.ext.search.push(
+          function (settings, data, dataIndex) {
+              var min = $('#min').datepicker("getDate");
+              var max = $('#max').datepicker("getDate");
+              var startDate = new Date(data[0]);
+              if (min == null && max == null) { return true; }
+              if (min == null && startDate <= max) { return true;}
+              if(max == null && startDate >= min) {return true;}
+              if (startDate <= max && startDate >= min) { return true; }
+              return false;
+          }
+        );
+
+        $("#min").datepicker({ 
+          onSelect: function () { table.draw(); }, 
+          changeMonth: true, 
+          changeYear: true,
+          dateFormat: 'yy-mm-dd'
         });
-      } );
+        $("#max").datepicker({ 
+          onSelect: function () { table.draw(); }, 
+          changeMonth: true, 
+          changeYear: true,
+          dateFormat: 'yy-mm-dd'
+        });
+
+        // clone header for column search
+        $('#sessions-table thead tr').clone(true).appendTo( '#sessions-table thead' );
+        $('#sessions-table thead tr:eq(0) th').each( function (i) {
+            var title = $(this).text();
+            $(this).html( '<input type="text" style="width:150px;" placeholder=" '+title+'" />' );
+            $( 'input', this ).on( 'keyup change', function () {
+                if ( table.column(i).search() !== this.value ) {
+                    table
+                        .column(i)
+                        .search( this.value )
+                        .draw();
+                }
+            } );
+        } );
+
+        var table = $('#sessions-table').DataTable( {
+            orderCellsTop: true,
+            fixedHeader: true,
+            "order": [[0, "desc"]],
+            dom: "<'row'<'col-sm-3'l><'col-sm-6 text-center'B><'col-sm-3'f>>" +
+                 "<'row'<'col-sm-12'tr>>" +
+                 "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            buttons: [
+              { extend: 'excelHtml5', title: 'User Sessions', footer: true, header: true },
+              { extend: 'pdfHtml5', title: 'User Sessions', footer: true, header: true },
+              { extend: 'csvHtml5', title: 'User Sessions', footer: true, header: true },
+              { extend: 'print', footer: true, header: true }
+            ]
+        } );
+
+        // redraw on date change
+        $('#min, #max').change(function () { table.draw(); });
+      });
     </script>
