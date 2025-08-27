@@ -47,6 +47,8 @@
                 <th>Destination</th>
                 <th>Unit Price</th>
                 <th>Total Price</th>
+                <th>Expenses</th>
+                <!-- Adjusted Total removed per request -->
                 <th>Advance</th>
                 <th>Balance</th>
                 @if(Auth::user()->role_id == 1)
@@ -58,27 +60,30 @@
         <tbody>
 
         	@foreach($roadmaps as $roadmap)
-        	<tr>
-        	 <td>{{$roadmap->supplier}}</td>
+            <tr>
+             <td>{{$roadmap->supplier}}</td>
              <td>{{ $roadmap->created_on }}</td>
-        	 <td>{{ $roadmap->received_on }}</td>
+             <td>{{ $roadmap->received_on }}</td>
             <td>{{ $roadmap->institution }}</td>
             <td>{{$roadmap->plate_number}}</td>
             <td>{{ $roadmap->ebm_number }}</td>
             <td>{{$roadmap->destination}}</td>
-        	<td>{{ number_format($roadmap->amount) }}</td>
-        	<td>{{ number_format($roadmap->ebm_number * $roadmap->amount) }}</td>
+            <td>{{ number_format($roadmap->amount) }}</td>
+            <td>{{ number_format($roadmap->ebm_number * $roadmap->amount) }}</td>
+            <td>{{ number_format($roadmap->total_charges ?? 0) }}</td>
+            <!-- Adjusted Total removed; Balance reflects total minus expenses and advances -->
             <td>{{ number_format($roadmap->advance_cash) }}</td>
-            <td>{{number_format(($roadmap->ebm_number * $roadmap->amount) - ($roadmap->advance_cash + $roadmap->advance_fuel + $roadmap->total_charges))}}</td>
+            <td>{{number_format((($roadmap->ebm_number * $roadmap->amount) - ($roadmap->total_charges ?? 0)) - ($roadmap->advance_cash + $roadmap->advance_fuel))}}</td>
             @if(Auth::user()->role_id == 1)
             <td></td>
             @endif
-        	</tr>
+            </tr>
         	@endforeach
         </tbody>
         	
         <tfoot>
             <tr>
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -264,7 +269,8 @@
             };
 
             // List of column indexes for which to calculate totals
-            var columns = [ 8, 9, 10]; // Adjust this array for other numeric columns
+            // We want to show totals for Expenses (index 9) and Balance (index 12) instead of raw Total Price
+            var columns = [9, 12]; // Expenses, Balance
 
             columns.forEach(function (column) {
                 var total = api

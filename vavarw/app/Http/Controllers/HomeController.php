@@ -123,8 +123,10 @@ $total_balance = 0;
 
 foreach ($roadmaps as $roadmap) {
     // Calculate balance for each roadmap
-    $balance = ($roadmap->ebm_number * $roadmap->amount) - 
-               ($roadmap->advance_cash + $roadmap->advance_fuel + $roadmap->total_charges);
+    $totalPrice = ($roadmap->ebm_number * $roadmap->amount);
+    $expenses = isset($roadmap->total_charges) ? (float) $roadmap->total_charges : 0.0;
+    $adjustedTotal = $totalPrice - $expenses; // total price minus expenses
+    $balance = $adjustedTotal - ($roadmap->advance_cash + $roadmap->advance_fuel);
     
     // Add the individual balance to the total balance
     $total_balance += $balance;
