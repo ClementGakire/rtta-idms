@@ -51,6 +51,7 @@ class BillsController extends Controller
                     'bills.payment_mode',
                     'bills.payment_date',
                     'bills.amount as bill_amount',
+                    'bills.ebm',
                     'suppliers.name as supplier',
                     'roadmaps.created_on',
                     'roadmaps.received_on',
@@ -62,7 +63,6 @@ class BillsController extends Controller
                     'roadmaps.amount',
                     'roadmaps.advance_cash',
                     'roadmaps.advance_fuel',
-                    
                     'roadmaps.plate',
                     DB::raw('COALESCE(SUM(charges.amount), 0) as charge_amount'),
                     'users.name as user_name'
@@ -72,6 +72,7 @@ class BillsController extends Controller
                     'bills.payment_mode',
                     'bills.payment_date',
                     'bills.amount',
+                    'bills.ebm',
                     'suppliers.name',
                     'roadmaps.created_on',
                     'roadmaps.received_on',
@@ -83,7 +84,6 @@ class BillsController extends Controller
                     'roadmaps.amount',
                     'roadmaps.advance_cash',
                     'roadmaps.advance_fuel',
-                    
                     'roadmaps.plate',
                     'users.name'
                 )
