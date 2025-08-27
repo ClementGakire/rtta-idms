@@ -37,37 +37,14 @@ class BillsController extends Controller
             ->leftJoin('roadmaps', 'bills.roadmap_id', 'roadmaps.id')
             ->select('bills.*', 'suppliers.name as name', 'roadmaps.purchase_order')
             ->get();
-            // Build a bills-centered query so the bills table is the primary source of rows.
-            // The view expects a `roadmaps` variable with these fields, so we produce the same shape.
+            
             $roadmaps = DB::table('bills')
                 ->join('roadmaps', 'bills.roadmap_id', '=', 'roadmaps.id')
-               
                 ->leftJoin('cars', 'roadmaps.plate', '=', 'cars.id')
                 ->leftJoin('contractors', 'roadmaps.contractor_id', '=', 'contractors.id')
                 ->leftJoin('drivers', 'roadmaps.driver_id', '=', 'drivers.id')
-                ->leftJoin('suppliers', 'cars.supplier_id', '=', 'suppliers.id')
                 ->select(
-                    'suppliers.name as supplier',
-                    'roadmaps.created_on',
-                    'roadmaps.received_on',
-                    'roadmaps.institution',
-                    'cars.plate_number',
-                    'roadmaps.purchase_order',
-                    'roadmaps.ebm_number',
-                    'roadmaps.destination',
-                    'roadmaps.amount',
-                    DB::raw("COALESCE(
-                        (SELECT SUM(c.amount) FROM charges c WHERE c.roadmap = roadmaps.id),
-                        (SELECT SUM(c2.amount) FROM charges c2 WHERE c2.roadmap = roadmaps.purchase_order),
-                        (SELECT SUM(c3.amount) FROM charges c3 WHERE c3.car_id = roadmaps.plate),
-                        0
-                    ) as total_charges"),
-                    'roadmaps.advance_cash',
-                    'roadmaps.advance_fuel'
-                )
-                ->groupBy(
-                    'suppliers.name',
-                    'roadmaps.created_on',
+                    'roadmaps.*',
                     'roadmaps.received_on',
                     'roadmaps.institution',
                     'cars.plate_number',
@@ -81,6 +58,7 @@ class BillsController extends Controller
                     'roadmaps.plate'
                 )
                 ->get();
+                dd($roadmaps);
         return view('bills.index')->with('bills', $bills)->with('roadmaps', $roadmaps);
         //return view('projects.index')->with('projects', $projects);
     }
