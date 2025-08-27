@@ -270,8 +270,10 @@
             };
 
             // List of column indexes for which to calculate totals
-            // We want to show totals for Expenses (index 10) and Balance (index 12) instead of raw Total Price
-            var columns = [10, 12]; // Expenses, Balance
+            // We want to show totals for Expenses (index 9) and Balance (index 11)
+            // Column index mapping (0-based): Supplier(0), Starting Date(1), Ending Date(2), Company(3), Plate Number(4), Days(5),
+            // Destination(6), Unit Price(7), Total Price(8), Expenses(9), Advance(10), Balance(11), Action(12 - conditional)
+            var columns = [9, 11]; // Expenses, Balance
 
             columns.forEach(function (column) {
                 var total = api
