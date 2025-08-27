@@ -48,6 +48,9 @@ class BillsController extends Controller
                 ->leftJoin('users', 'bills.user_id', '=', 'users.id')
                 ->select(
                     'bills.id',
+                    'bills.payment_mode',
+                    'bills.payment_date',
+                    'bills.amount as bill_amount',
                     'suppliers.name as supplier',
                     'roadmaps.created_on',
                     'roadmaps.received_on',
@@ -66,6 +69,9 @@ class BillsController extends Controller
                 )
                 ->groupBy(
                     'bills.id',
+                    'bills.payment_mode',
+                    'bills.payment_date',
+                    'bills.amount as bill_amount',
                     'suppliers.name',
                     'roadmaps.created_on',
                     'roadmaps.received_on',

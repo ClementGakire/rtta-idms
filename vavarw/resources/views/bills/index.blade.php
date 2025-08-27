@@ -48,6 +48,9 @@
                 <th>Unit Price</th>
                 <th>Total Price</th>
                 <th>Expenses</th>
+                <th>Bill Amount</th>
+                <th>Payment Mode</th>
+                <th>Payment Date</th>
                 <!-- Adjusted Total removed per request -->
                 <th>Advance</th>
                 <th>Balance</th>
@@ -72,9 +75,12 @@
             <td>{{ number_format($roadmap->amount) }}</td>
             <td>{{ number_format($roadmap->ebm_number * $roadmap->amount) }}</td>
             <td>{{ number_format($roadmap->charge_amount ?? 0) }}</td>
+            <td>{{ number_format($roadmap->bill_amount ?? 0) }}</td>
+            <td>{{ $roadmap->payment_mode }}</td>
+            <td>{{ $roadmap->payment_date }}</td>
             <!-- Balance reflects total minus expenses and advances -->
             <td>{{ number_format($roadmap->advance_cash) }}</td>
-            <td>{{number_format((($roadmap->ebm_number * $roadmap->amount) - ($roadmap->charge_amount ?? 0)) - ($roadmap->advance_cash + $roadmap->advance_fuel))}}</td>
+            <td>{{number_format((($roadmap->ebm_number * $roadmap->amount) - ($roadmap->charge_amount ?? 0) - ($roadmap->bill_amount ?? 0)) - ($roadmap->advance_cash + $roadmap->advance_fuel))}}</td>
             @if(Auth::user()->role_id == 1)
             <td>
                 <a href="/bills/{{$roadmap->id}}/edit" class="btn btn-primary">Edit</a>
@@ -277,10 +283,10 @@
             };
 
             // List of column indexes for which to calculate totals
-            // We want to show totals for Expenses (index 9) and Balance (index 11)
+            // We want to show totals for Expenses (index 9), Bill Amount (index 10) and Balance (index 12)
             // Column index mapping (0-based): Supplier(0), Starting Date(1), Ending Date(2), Company(3), Plate Number(4), Days(5),
-            // Destination(6), Unit Price(7), Total Price(8), Expenses(9), Advance(10), Balance(11), Action(12 - conditional)
-            var columns = [9, 11]; // Expenses, Balance
+            // Destination(6), Unit Price(7), Total Price(8), Expenses(9), Bill Amount(10), Payment Mode(11), Payment Date(12), Advance(13), Balance(14), Action(15 - conditional)
+            var columns = [9, 10, 14]; // Expenses, Bill Amount, Balance
 
             columns.forEach(function (column) {
                 var total = api
