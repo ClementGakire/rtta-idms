@@ -66,19 +66,20 @@
              <td>{{ $roadmap->received_on }}</td>
             <td>{{ $roadmap->institution }}</td>
             <td>{{$roadmap->plate_number}}</td>
+            <td>{{ $roadmap->purchase_order ?? '' }}</td>
             <td>{{ $roadmap->ebm_number }}</td>
             <td>{{$roadmap->destination}}</td>
             <td>{{ number_format($roadmap->amount) }}</td>
             <td>{{ number_format($roadmap->ebm_number * $roadmap->amount) }}</td>
             <td>{{ number_format($roadmap->total_charges ?? 0) }}</td>
-            <!-- Adjusted Total removed; Balance reflects total minus expenses and advances -->
+            <!-- Balance reflects total minus expenses and advances -->
             <td>{{ number_format($roadmap->advance_cash) }}</td>
             <td>{{number_format((($roadmap->ebm_number * $roadmap->amount) - ($roadmap->total_charges ?? 0)) - ($roadmap->advance_cash + $roadmap->advance_fuel))}}</td>
             @if(Auth::user()->role_id == 1)
             <td></td>
             @endif
             </tr>
-        	@endforeach
+         	@endforeach
         </tbody>
         	
         <tfoot>
@@ -269,8 +270,8 @@
             };
 
             // List of column indexes for which to calculate totals
-            // We want to show totals for Expenses (index 9) and Balance (index 12) instead of raw Total Price
-            var columns = [9, 12]; // Expenses, Balance
+            // We want to show totals for Expenses (index 10) and Balance (index 12) instead of raw Total Price
+            var columns = [10, 12]; // Expenses, Balance
 
             columns.forEach(function (column) {
                 var total = api

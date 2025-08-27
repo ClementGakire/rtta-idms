@@ -10,7 +10,8 @@ use App\Car;
 use App\Driver;
 use App\User;
 use Illuminate\Http\Request;
-use DB;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class BillsController extends Controller
 {
@@ -31,69 +32,53 @@ class BillsController extends Controller
     public function index()
     {
         //
-        $bills = Bill::all();
         $bills = DB::table('bills')
             ->leftJoin('suppliers', 'bills.supplier_id', 'suppliers.id')
             ->leftJoin('roadmaps', 'bills.roadmap_id', 'roadmaps.id')
             ->select('bills.*', 'suppliers.name as name', 'roadmaps.purchase_order')
             ->get();
-        $roadmaps = DB::table('roadmaps')
-    ->join('users', 'roadmaps.user_id', '=', 'users.id')
-    ->leftJoin('pos', 'roadmaps.purchase_order', 'pos.purchase_order')
-    ->leftJoin('cars', 'roadmaps.plate', 'cars.id')
-    ->leftJoin('contractors', 'roadmaps.contractor_id', 'contractors.id')
-    ->leftJoin('drivers', 'roadmaps.driver_id', '=', 'drivers.id')
-    ->leftJoin('charges', function($join) {
-        $join->on('roadmaps.plate', '=', 'charges.car_id')
-             ->on('roadmaps.id', '=', 'charges.roadmap'); // Check both plate and purchase order
-    })
-    ->leftJoin('suppliers', 'cars.supplier_id', '=', 'suppliers.id') // Join suppliers to cars
-    ->select(
-        'users.name',
-        'cars.plate_number',
-        'roadmaps.purchase_order',
-        'drivers.name as driver',
-        'roadmaps.institution',
-        'roadmaps.created_on',
-        'roadmaps.received_on',
-        'roadmaps.amount',
-        'roadmaps.id',
-        'roadmaps.ebm_number',
-        'roadmaps.odometer_count',
-        'roadmaps.operator',
-        'roadmaps.selling_price',
-        'roadmaps.advance_cash',
-        'roadmaps.advance_fuel',
-        'roadmaps.status',
-        'roadmaps.destination',
-        'pos.amounts',
-        'contractors.name as contractor',
-        DB::raw('SUM(charges.amount) as total_charges'), // Sum of charges
-        'suppliers.name as supplier' // Select supplier's name
-    )
-    ->groupBy(
-        'users.name',
-        'cars.plate_number',
-        'roadmaps.purchase_order',
-        'drivers.name',
-        'roadmaps.institution',
-        'roadmaps.created_on',
-        'roadmaps.received_on',
-        'roadmaps.amount',
-        'roadmaps.id',
-        'roadmaps.ebm_number',
-        'roadmaps.odometer_count',
-        'roadmaps.operator',
-        'roadmaps.selling_price',
-        'roadmaps.advance_cash',
-        'roadmaps.advance_fuel',
-        'roadmaps.status',
-        'roadmaps.destination',
-        'pos.amounts',
-        'contractors.name',
-        'suppliers.name' // Include supplier's name in groupBy
-    )
-    ->get();
+            // Build a bills-centered query so the bills table is the primary source of rows.
+            // The view expects a `roadmaps` variable with these fields, so we produce the same shape.
+            $roadmaps = DB::table('bills')
+                ->join('roadmaps', 'bills.roadmap_id', '=', 'roadmaps.id')
+                ->leftJoin('pos', 'roadmaps.purchase_order', '=', 'pos.purchase_order')
+                ->leftJoin('cars', 'roadmaps.plate', '=', 'cars.id')
+                ->leftJoin('contractors', 'roadmaps.contractor_id', '=', 'contractors.id')
+                ->leftJoin('drivers', 'roadmaps.driver_id', '=', 'drivers.id')
+                ->leftJoin('suppliers', 'cars.supplier_id', '=', 'suppliers.id')
+                ->select(
+                    'suppliers.name as supplier',
+                    'roadmaps.created_on',
+                    'roadmaps.received_on',
+                    'roadmaps.institution',
+                    'cars.plate_number',
+                    DB::raw("COALESCE(NULLIF(roadmaps.purchase_order, '0'), pos.purchase_order) as purchase_order"),
+                    'roadmaps.ebm_number',
+                    'roadmaps.destination',
+                    'roadmaps.amount',
+                    DB::raw("COALESCE(
+                        (SELECT SUM(c.amount) FROM charges c WHERE c.roadmap = roadmaps.id),
+                        (SELECT SUM(c2.amount) FROM charges c2 WHERE c2.purchase_order = roadmaps.purchase_order),
+                        (SELECT SUM(c3.amount) FROM charges c3 WHERE c3.car_id = roadmaps.plate),
+                        0
+                    ) as total_charges"),
+                    'roadmaps.advance_cash',
+                    'roadmaps.advance_fuel'
+                )
+                ->groupBy(
+                    'suppliers.name',
+                    'roadmaps.created_on',
+                    'roadmaps.received_on',
+                    'roadmaps.institution',
+                    'cars.plate_number',
+                    DB::raw("COALESCE(NULLIF(roadmaps.purchase_order, '0'), pos.purchase_order)"),
+                    'roadmaps.ebm_number',
+                    'roadmaps.destination',
+                    'roadmaps.amount',
+                    'roadmaps.advance_cash',
+                    'roadmaps.advance_fuel'
+                )
+                ->get();
         return view('bills.index')->with('bills', $bills)->with('roadmaps', $roadmaps);
         //return view('projects.index')->with('projects', $projects);
     }
@@ -139,7 +124,8 @@ class BillsController extends Controller
         $bill->quoted_amount = $request->input('quoted_amount');
         $bill->payment_date = $request->input('payment_date'); 
         $bill->files = implode("|", $images);
-        $bill->payment_mode = $request->has('payment_mode') 
+        $bill->user_id = Auth::id();
+        $bill->payment_mode = $request->has('payment_mode')
             ? implode(",", $request->input('payment_mode')) 
             : null;
         $bill->save();
