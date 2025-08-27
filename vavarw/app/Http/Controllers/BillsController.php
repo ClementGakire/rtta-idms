@@ -135,6 +135,7 @@ class BillsController extends Controller
         $bill->payment_date = $request->input('payment_date'); 
         $bill->files = implode("|", $images);
         $bill->user_id = Auth::id();
+        $bill->ebm = $request->input('ebm');
         $bill->payment_mode = $request->has('payment_mode')
             ? implode(",", $request->input('payment_mode')) 
             : null;
@@ -189,6 +190,7 @@ class BillsController extends Controller
         $bill->payment_mode = $request->has('payment_mode') 
             ? implode(",", $request->input('payment_mode')) 
             : null;
+        $bill->ebm = $request->input('ebm');
         $bill->save();
         return redirect('/bills')->with('success','bill edited');
     }

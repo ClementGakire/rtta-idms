@@ -79,7 +79,10 @@
                         <label for="title">Payment Date</label>
                         <input type="date" class="form-control" id="title" placeholder="Amount" name="payment_date" required value="{{ $bill->payment_date }}">
                       </div>
-
+                      <div class="form-group">
+                        <label for="title">EBM</label>
+                        <input type="text" class="form-control" id="title" placeholder="EBM" name="ebm" required value="{{ $bill->ebm }}">
+                      </div>
                       <div class="form-group">
                         <label for="title">Files (invoices, receipts)</label>
                         <input type="file" class="form-control" name="files[]" placeholder="files" multiple>

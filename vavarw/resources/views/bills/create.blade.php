@@ -70,6 +70,10 @@
                         <input type="date" class="form-control" id="title" placeholder="Amount" name="payment_date" required>
                       </div>
                       <div class="form-group">
+                        <label for="title">EBM</label>
+                        <input type="text" class="form-control" id="title" placeholder="EBM" name="ebm" required>
+                      </div>
+                      <div class="form-group">
                         <label for="title">Files (invoices, receipts, etc)</label>
                         <input type="file" class="form-control" name="files[]" placeholder="files" multiple>
                       </div>
