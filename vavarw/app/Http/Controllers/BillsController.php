@@ -47,6 +47,7 @@ class BillsController extends Controller
                 ->leftJoin('charges', 'roadmaps.id', '=', 'charges.roadmap')
                 ->leftJoin('users', 'bills.user_id', '=', 'users.id')
                 ->select(
+                    'bills.id',
                     'suppliers.name as supplier',
                     'roadmaps.created_on',
                     'roadmaps.received_on',
@@ -58,12 +59,13 @@ class BillsController extends Controller
                     'roadmaps.amount',
                     'roadmaps.advance_cash',
                     'roadmaps.advance_fuel',
-                    'bills.id',
+                    
                     'roadmaps.plate',
                     DB::raw('COALESCE(SUM(charges.amount), 0) as charge_amount'),
                     'users.name as user_name'
                 )
                 ->groupBy(
+                    'bills.id',
                     'suppliers.name',
                     'roadmaps.created_on',
                     'roadmaps.received_on',
@@ -75,7 +77,7 @@ class BillsController extends Controller
                     'roadmaps.amount',
                     'roadmaps.advance_cash',
                     'roadmaps.advance_fuel',
-                    'bills.id',
+                    
                     'roadmaps.plate',
                     'users.name'
                 )
