@@ -66,15 +66,15 @@
              <td>{{ $roadmap->received_on }}</td>
             <td>{{ $roadmap->institution }}</td>
             <td>{{$roadmap->plate_number}}</td>
-            <td>{{ $roadmap->purchase_order ?? '' }}</td>
+            
             <td>{{ $roadmap->ebm_number }}</td>
             <td>{{$roadmap->destination}}</td>
             <td>{{ number_format($roadmap->amount) }}</td>
             <td>{{ number_format($roadmap->ebm_number * $roadmap->amount) }}</td>
-            <td>{{ number_format($roadmap->total_charges ?? 0) }}</td>
+            <td>{{ number_format($roadmap->charge_amount ?? 0) }}</td>
             <!-- Balance reflects total minus expenses and advances -->
             <td>{{ number_format($roadmap->advance_cash) }}</td>
-            <td>{{number_format((($roadmap->ebm_number * $roadmap->amount) - ($roadmap->total_charges ?? 0)) - ($roadmap->advance_cash + $roadmap->advance_fuel))}}</td>
+            <td>{{number_format((($roadmap->ebm_number * $roadmap->amount) - ($roadmap->charge_amount ?? 0)) - ($roadmap->advance_cash + $roadmap->advance_fuel))}}</td>
             @if(Auth::user()->role_id == 1)
             <td></td>
             @endif
