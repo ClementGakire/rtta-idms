@@ -58,7 +58,7 @@ class BillsController extends Controller
                     'roadmaps.amount',
                     'roadmaps.advance_cash',
                     'roadmaps.advance_fuel',
-                    'roadmaps.id',
+                    'bills.id',
                     'roadmaps.plate',
                     DB::raw('COALESCE(SUM(charges.amount), 0) as charge_amount'),
                     'users.name as user_name'
@@ -75,7 +75,7 @@ class BillsController extends Controller
                     'roadmaps.amount',
                     'roadmaps.advance_cash',
                     'roadmaps.advance_fuel',
-                    'roadmaps.id',
+                    'bills.id',
                     'roadmaps.plate',
                     'users.name'
                 )
