@@ -151,7 +151,7 @@
                       <div class="text-right text-secondary">
                         <h5>Balance to <br>Suppliers</h5>
                         
-                        <h3>{{  $balance_to_supplier - $total_expenses }}</h3>
+                        <h3>0</h3>
                         
                       </div>
                     </div>
