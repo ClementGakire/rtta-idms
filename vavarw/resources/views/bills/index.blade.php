@@ -76,7 +76,14 @@
             <td>{{ number_format($roadmap->advance_cash) }}</td>
             <td>{{number_format((($roadmap->ebm_number * $roadmap->amount) - ($roadmap->charge_amount ?? 0)) - ($roadmap->advance_cash + $roadmap->advance_fuel))}}</td>
             @if(Auth::user()->role_id == 1)
-            <td></td>
+            <td>
+                <a href="/bills/{{$roadmap->id}}/edit" class="btn btn-primary">Edit</a>
+                {!!Form::open(['action' => ['BillsController@destroy', $roadmap->id], 'method' => 'POST', 'class' => 'pull-right'])!!}
+                    {{Form::hidden('_method', 'DELETE')}}
+                    {{Form::submit('Delete', ['class' => 'btn btn-danger'])}}
+                {!!Form::close()!!}
+                
+            </td>
             @endif
             </tr>
          	@endforeach
