@@ -78,11 +78,11 @@
             @if(Auth::user()->role_id == 1)
             <td>
                 <a href="/bills/{{$roadmap->id}}/edit" class="btn btn-primary">Edit</a>
-                {!!Form::open(['action' => ['BillsController@destroy', $roadmap->id], 'method' => 'POST', 'class' => 'pull-right'])!!}
-                    {{Form::hidden('_method', 'DELETE')}}
-                    {{Form::submit('Delete', ['class' => 'btn btn-danger'])}}
-                {!!Form::close()!!}
-                
+                <form action="{{ action('BillsController@destroy', [$roadmap->id]) }}" method="POST" style="display:inline;">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
             </td>
             @endif
             </tr>
