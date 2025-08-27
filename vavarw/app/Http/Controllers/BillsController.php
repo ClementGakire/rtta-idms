@@ -41,7 +41,7 @@ class BillsController extends Controller
             // The view expects a `roadmaps` variable with these fields, so we produce the same shape.
             $roadmaps = DB::table('bills')
                 ->join('roadmaps', 'bills.roadmap_id', '=', 'roadmaps.id')
-                ->leftJoin('pos', 'roadmaps.purchase_order', '=', 'pos.purchase_order')
+               
                 ->leftJoin('cars', 'roadmaps.plate', '=', 'cars.id')
                 ->leftJoin('contractors', 'roadmaps.contractor_id', '=', 'contractors.id')
                 ->leftJoin('drivers', 'roadmaps.driver_id', '=', 'drivers.id')
@@ -52,7 +52,7 @@ class BillsController extends Controller
                     'roadmaps.received_on',
                     'roadmaps.institution',
                     'cars.plate_number',
-                    DB::raw("COALESCE(NULLIF(roadmaps.purchase_order, '0'), pos.purchase_order) as purchase_order"),
+                    'roadmaps.purchase_order',
                     'roadmaps.ebm_number',
                     'roadmaps.destination',
                     'roadmaps.amount',
@@ -71,7 +71,7 @@ class BillsController extends Controller
                     'roadmaps.received_on',
                     'roadmaps.institution',
                     'cars.plate_number',
-                    DB::raw("COALESCE(NULLIF(roadmaps.purchase_order, '0'), pos.purchase_order)"),
+                    'roadmaps.purchase_order',
                     'roadmaps.ebm_number',
                     'roadmaps.destination',
                     'roadmaps.amount',
