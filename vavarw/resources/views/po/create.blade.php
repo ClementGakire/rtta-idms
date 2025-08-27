@@ -103,7 +103,7 @@
                       </div>
                       <div class="form-group">
                         <label for="title">Roadmap Number</label>
-                        <input type="number" class="form-control" id="title" placeholder="Roadmap Number" name="roadmap_number">
+                        <input type="text" class="form-control" id="title" placeholder="Roadmap Number" name="roadmap_number" required>
                       </div>
                       
                       <div class="form-group">
