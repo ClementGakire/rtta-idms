@@ -71,7 +71,7 @@ class BillsController extends Controller
                     'bills.id',
                     'bills.payment_mode',
                     'bills.payment_date',
-                    'bills.amount as bill_amount',
+                    'bills.amount',
                     'suppliers.name',
                     'roadmaps.created_on',
                     'roadmaps.received_on',
