@@ -80,7 +80,7 @@ class BillsController extends Controller
                     'users.name'
                 )
                 ->get();
-                dd($roadmaps);
+                // dd($roadmaps);
         return view('bills.index')->with('bills', $bills)->with('roadmaps', $roadmaps);
         //return view('projects.index')->with('projects', $projects);
     }
