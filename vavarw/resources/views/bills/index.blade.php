@@ -48,7 +48,7 @@
                 <th>Unit Price</th>
                 <th>Total Price</th>
                 <th>Expenses</th>
-                <th>Bill Amount</th>
+                <th>Paid Amount</th>
                 <th>Payment Mode</th>
                 <th>Payment Date</th>
                 <!-- Adjusted Total removed per request -->
@@ -97,6 +97,9 @@
         	
         <tfoot>
             <tr>
+                <th></th>
+                <th></th>
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
