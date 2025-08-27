@@ -35,7 +35,7 @@ class ChargesController extends Controller
             ->leftJoin('roadmaps', 'charges.roadmap', 'roadmaps.id')
             ->leftJoin('cars', 'charges.car_id', 'cars.id')
             ->leftJoin('expenses', 'charges.expense_id', 'expenses.id')
-            ->select('charges.*', 'cars.plate_number', 'expenses.name', 'roadmaps.purchase_order', 'drivers.name as driver')
+            ->select('charges.*', 'cars.plate_number', 'expenses.name', 'roadmaps.roadmap_number', 'drivers.name as driver')
             ->get();
         //$charges = Charge::all();
         return view('charges.index')->with('charges', $charges);

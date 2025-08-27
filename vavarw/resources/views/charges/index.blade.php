@@ -38,7 +38,7 @@
                 <table id="example" class="display" style="width:100%" style="padding-left: 60px">
         <thead>
             <tr>
-                <th>P.O Number</th>
+                <th>Roadmap Number</th>
                 <th>Car</th>
                 <th>Supplier</th>
                 <th>Expense Type</th>
@@ -58,7 +58,7 @@
         	@foreach($charges as $charge)
         	<tr>
         		
-        		<td>{{ $charge->roadmap }}</td>
+        		<td>{{ $charge->roadmap_number }}</td>
                 <td>{{ $charge->plate_number }}</td>
                 <td>{{ $charge->supplier }}</td>
                 <td>{{ $charge->name }}</td>
