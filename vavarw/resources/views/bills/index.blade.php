@@ -51,6 +51,7 @@
                 <th>Paid Amount</th>
                 <th>Payment Mode</th>
                 <th>Payment Date</th>
+                <th>EBM</th>
                 <!-- Adjusted Total removed per request -->
                 <th>Advance</th>
                 <th>Balance</th>
@@ -78,6 +79,7 @@
             <td>{{ number_format($roadmap->bill_amount ?? 0) }}</td>
             <td>{{ $roadmap->payment_mode }}</td>
             <td>{{ $roadmap->payment_date }}</td>
+            <td>{{ $roadmap->ebm }}</td>
             <!-- Balance reflects total minus expenses and advances -->
             <td>{{ number_format($roadmap->advance_cash) }}</td>
             <td>{{number_format((($roadmap->ebm_number * $roadmap->amount) - ($roadmap->charge_amount ?? 0) - ($roadmap->bill_amount ?? 0)) - ($roadmap->advance_cash + $roadmap->advance_fuel))}}</td>
@@ -97,6 +99,7 @@
         	
         <tfoot>
             <tr>
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
