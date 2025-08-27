@@ -42,7 +42,9 @@
                 @endif
                 <!-- <li class="nav-item {{ Request::segment(1) === '/po/export' ? 'current' : null }}"><a href="/po/export" class="nav-link text-white p-3 mb-1 sidebar-link"><i class="fas fa-money-bill text-light fa-lg mr-3"></i>Gen Roadmap</a></li> -->
                 @if(Auth::user()->role_id == 1)
-                <li class="nav-item {{ Request::segment(1) === 'users' ? 'current' : null }}"><a href="/users" class="nav-link text-white p-3 mb-1 sidebar-link"><i class="fas fa-users text-light fa-lg mr-3"></i>Users</a></li>@endif
+                <li class="nav-item {{ Request::segment(1) === 'users' ? 'current' : null }}"><a href="/users" class="nav-link text-white p-3 mb-1 sidebar-link"><i class="fas fa-users text-light fa-lg mr-3"></i>Users</a></li>
+                <li class="nav-item {{ Request::segment(1) === 'user-sessions' ? 'current' : null }}"><a href="/user-sessions" class="nav-link text-white p-3 mb-1 sidebar-link"><i class="fas fa-clock text-light fa-lg mr-3"></i>User Sessions</a></li>
+                @endif
                 <!--<li class="nav-item"><a href="#" class="nav-link text-white p-3 mb-1 sidebar-link"><i class="fas fa-chart-bar text-light fa-lg mr-3"></i>Charts</a></li>-->
               </ul>
             </div>
