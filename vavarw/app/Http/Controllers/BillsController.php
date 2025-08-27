@@ -76,7 +76,8 @@ class BillsController extends Controller
                     'roadmaps.destination',
                     'roadmaps.amount',
                     'roadmaps.advance_cash',
-                    'roadmaps.advance_fuel'
+                    'roadmaps.advance_fuel',
+                    'roadmaps.id'
                 )
                 ->get();
         return view('bills.index')->with('bills', $bills)->with('roadmaps', $roadmaps);
