@@ -58,7 +58,7 @@ class BillsController extends Controller
                     'roadmaps.amount',
                     DB::raw("COALESCE(
                         (SELECT SUM(c.amount) FROM charges c WHERE c.roadmap = roadmaps.id),
-                        (SELECT SUM(c2.amount) FROM charges c2 WHERE c2.purchase_order = roadmaps.purchase_order),
+                        (SELECT SUM(c2.amount) FROM charges c2 WHERE c2.roadmap = roadmaps.purchase_order),
                         (SELECT SUM(c3.amount) FROM charges c3 WHERE c3.car_id = roadmaps.plate),
                         0
                     ) as total_charges"),
