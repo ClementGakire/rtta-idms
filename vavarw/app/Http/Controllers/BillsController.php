@@ -43,8 +43,12 @@ class BillsController extends Controller
                 ->leftJoin('cars', 'roadmaps.plate', '=', 'cars.id')
                 ->leftJoin('contractors', 'roadmaps.contractor_id', '=', 'contractors.id')
                 ->leftJoin('drivers', 'roadmaps.driver_id', '=', 'drivers.id')
+                ->leftJoin('suppliers', 'cars.supplier_id', '=', 'suppliers.id')
+                ->leftJoin('charges', 'roadmaps.id', '=', 'charges.roadmap')
+                ->leftJoin('users', 'bills.user_id', '=', 'users.id')
                 ->select(
-                    'roadmaps.*',
+                    'suppliers.name as supplier',
+                    'roadmaps.created_on',
                     'roadmaps.received_on',
                     'roadmaps.institution',
                     'cars.plate_number',
@@ -55,7 +59,25 @@ class BillsController extends Controller
                     'roadmaps.advance_cash',
                     'roadmaps.advance_fuel',
                     'roadmaps.id',
-                    'roadmaps.plate'
+                    'roadmaps.plate',
+                    DB::raw('COALESCE(SUM(charges.amount), 0) as charge_amount'),
+                    'users.name as user_name'
+                )
+                ->groupBy(
+                    'suppliers.name',
+                    'roadmaps.created_on',
+                    'roadmaps.received_on',
+                    'roadmaps.institution',
+                    'cars.plate_number',
+                    'roadmaps.purchase_order',
+                    'roadmaps.ebm_number',
+                    'roadmaps.destination',
+                    'roadmaps.amount',
+                    'roadmaps.advance_cash',
+                    'roadmaps.advance_fuel',
+                    'roadmaps.id',
+                    'roadmaps.plate',
+                    'users.name'
                 )
                 ->get();
                 dd($roadmaps);
