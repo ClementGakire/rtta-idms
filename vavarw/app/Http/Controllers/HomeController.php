@@ -132,9 +132,9 @@ foreach ($roadmaps as $roadmap) {
     $total_balance += $balance;
 }
 
-// Now you have the total balance for all records
-$balance_to_supplier = $total_balance;
-        // $balance_to_supplier = $total_quoted_amount - $total_amount;
+// Now you have the total balance for all records. Deduct total bills amount as well.
+$balance_to_supplier = $total_balance - ($total_amount ?? 0);
+    // alternative: $balance_to_supplier = $total_quoted_amount - $total_amount;
        // $reports = DB::table('invoices')
          //   ->select('payments', 'invoices.institution', '=', 'payments.institution')
            // 
