@@ -48,8 +48,51 @@
                         <input type="text" class="form-control" id="title" placeholder="Amount" name="amount" required value="{{ $bill->amount }}">
                       </div>
                       <div class="form-group">
+                        <label for="payment_mode">Payment Mode</label><br>
+                        @php
+                          $selected = explode(',', $bill->payment_mode ?? '');
+                        @endphp
+
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" name="payment_mode[]" value="MoMo" id="momo"
+                            {{ in_array('MoMo', $selected) ? 'checked' : '' }}>
+                          <label class="form-check-label" for="momo">MoMo</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" name="payment_mode[]" value="Bank Transfer" id="bank_transfer"
+                            {{ in_array('Bank Transfer', $selected) ? 'checked' : '' }}>
+                          <label class="form-check-label" for="bank_transfer">Bank Transfer</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" name="payment_mode[]" value="Cash" id="cash"
+                            {{ in_array('Cash', $selected) ? 'checked' : '' }}>
+                          <label class="form-check-label" for="cash">Cash</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" name="payment_mode[]" value="Check" id="check"
+                            {{ in_array('Check', $selected) ? 'checked' : '' }}>
+                          <label class="form-check-label" for="check">Check</label>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
                         <label for="title">Payment Date</label>
                         <input type="date" class="form-control" id="title" placeholder="Amount" name="payment_date" required value="{{ $bill->payment_date }}">
+                      </div>
+                      <div class="form-group">
+                        <label for="title">EBM</label>
+                        <input type="text" class="form-control" id="title" placeholder="EBM" name="ebm" required value="{{ $bill->ebm }}">
+                      </div>
+                      <div class="form-group">
+                        <label for="title">Files (invoices, receipts)</label>
+                        <input type="file" class="form-control" name="files[]" placeholder="files" multiple>
+                        @if(!empty($bill->files))
+                          <div style="padding-top:8px">
+                            @foreach(explode('|', $bill->files) as $f)
+                              <a href="/images/{{ $f }}" target="_blank">{{ $f }}</a><br>
+                            @endforeach
+                          </div>
+                        @endif
                       </div>
                       <button type="submit" class="btn btn-primary">Submit</button>                 
                </form>

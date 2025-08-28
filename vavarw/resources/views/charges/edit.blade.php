@@ -38,12 +38,12 @@
 
                       </div>
                       <div class="form-group">
-                        <label for="title">Purchase Order Number</label>
-                        <input type="" name="roadmap" list="roadmaps" class="form-control" placeholder="Search Purchase Order Number" id="txts" value="{{$charge->roadmap}}">
+                        <label for="title">Roadmap Number</label>
+                        <input type="" name="roadmap" list="roadmaps" class="form-control" placeholder="Search Roadmap Number" id="txts" value="{{$charge->roadmap}}">
                         <datalist id="roadmaps">  
                         
                           @foreach($roadmaps as $roadmap)
-                          <option value="{{$roadmap->id}}">{{$roadmap->purchase_order}}</option>
+                          <option value="{{$roadmap->id}}">{{$roadmap->roadmap_number}}</option>
                           @endforeach
                         </datalist>
 

@@ -51,10 +51,13 @@ class HomeController extends Controller
         $total_tire_expenses = DB::table('charges')->where('expense_id', 4)->sum('amount');
         $total_lubricant_expenses = DB::table('charges')->where('expense_id', 5)->sum('amount');
         $total_traffic_fines_expenses = DB::table('charges')->where('expense_id', 1)->sum('amount');
-        $total_expenses = DB::table('charges')->sum('amount');
-        $total_fuels = DB::table('fuels')->sum('totalprice');
-        $total_amount = DB::table('bills')->sum('amount');
-        $margin_after_all_expenses = $totalSellingPrice - ($total_expenses + $total_fuels + $total_amount);
+    $total_expenses = DB::table('charges')->sum('amount');
+    $total_fuels = DB::table('fuels')->sum('totalprice');
+    $total_amount = DB::table('bills')->sum('amount');
+    // Include bills amount as part of total expenses
+    $total_expenses = ($total_expenses ?? 0) + ($total_amount ?? 0);
+    // margin subtracts total expenses (which now includes bills) and fuels
+    $margin_after_all_expenses = $totalSellingPrice - ($total_expenses + $total_fuels);
         $total_number_of_vehicles = DB::table('cars')->count();
         $total_amount_on_spare_parts = DB::table('charges')->where('expense_id', 6)->sum('amount');
         $total_amount_on_vehicle_inspection = DB::table('charges')->where('expense_id', 7)->sum('amount');
@@ -123,16 +126,18 @@ $total_balance = 0;
 
 foreach ($roadmaps as $roadmap) {
     // Calculate balance for each roadmap
-    $balance = ($roadmap->ebm_number * $roadmap->amount) - 
-               ($roadmap->advance_cash + $roadmap->advance_fuel + $roadmap->total_charges);
+    $totalPrice = ($roadmap->ebm_number * $roadmap->amount);
+    $expenses = isset($roadmap->total_charges) ? (float) $roadmap->total_charges : 0.0;
+    $adjustedTotal = $totalPrice - $expenses; // total price minus expenses
+    $balance = $adjustedTotal - ($roadmap->advance_cash + $roadmap->advance_fuel);
     
     // Add the individual balance to the total balance
     $total_balance += $balance;
 }
 
-// Now you have the total balance for all records
-$balance_to_supplier = $total_balance;
-        // $balance_to_supplier = $total_quoted_amount - $total_amount;
+// Now you have the total balance for all records. Deduct total bills amount as well.
+$balance_to_supplier = $total_balance - ($total_amount ?? 0);
+    // alternative: $balance_to_supplier = $total_quoted_amount - $total_amount;
        // $reports = DB::table('invoices')
          //   ->select('payments', 'invoices.institution', '=', 'payments.institution')
            // 
