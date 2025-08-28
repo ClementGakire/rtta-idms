@@ -38,8 +38,9 @@ class BillsController extends Controller
             ->select('bills.*', 'suppliers.name as name', 'roadmaps.purchase_order')
             ->get();
             
-            $roadmaps = DB::table('bills')
-                ->join('roadmaps', 'bills.roadmap_id', '=', 'roadmaps.id')
+            // Start from roadmaps and left-join bills so every roadmap is returned
+            $roadmaps = DB::table('roadmaps')
+                ->leftJoin('bills', 'bills.roadmap_id', '=', 'roadmaps.id')
                 ->leftJoin('cars', 'roadmaps.plate', '=', 'cars.id')
                 ->leftJoin('contractors', 'roadmaps.contractor_id', '=', 'contractors.id')
                 ->leftJoin('drivers', 'roadmaps.driver_id', '=', 'drivers.id')
@@ -68,6 +69,7 @@ class BillsController extends Controller
                     'users.name as user_name'
                 )
                 ->groupBy(
+                    'roadmaps.id',
                     'bills.id',
                     'bills.payment_mode',
                     'bills.payment_date',
