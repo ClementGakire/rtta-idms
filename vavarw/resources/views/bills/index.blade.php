@@ -292,7 +292,7 @@
             // Supplier(0), Starting Date(1), Ending Date(2), Company(3), Plate Number(4), Days(5),
             // Destination(6), Unit Price(7), Total Price(8), Expenses(9), Paid Amount/Bill Amount(10), Payment Mode(11), Payment Date(12), EBM(13), Advance(14), Balance(15), Action(16 - conditional)
             // We want to calculate totals for: Expenses (9), Paid Amount (10) and Balance (15)
-            var columns = [9, 10, 15]; // Expenses, Paid Amount, Balance
+            var columns = [9, 10, 15, 16]; // Expenses, Paid Amount, Balance
 
             columns.forEach(function (column) {
                 var total = api
