@@ -288,11 +288,11 @@
                 return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             };
 
-            // List of column indexes for which to calculate totals
-            // We want to show totals for Expenses (index 9), Bill Amount (index 10) and Balance (index 12)
-            // Column index mapping (0-based): Supplier(0), Starting Date(1), Ending Date(2), Company(3), Plate Number(4), Days(5),
-            // Destination(6), Unit Price(7), Total Price(8), Expenses(9), Bill Amount(10), Payment Mode(11), Payment Date(12), Advance(13), Balance(14), Action(15 - conditional)
-            var columns = [9, 10, 14]; // Expenses, Bill Amount, Balance
+            // Column index mapping (0-based):
+            // Supplier(0), Starting Date(1), Ending Date(2), Company(3), Plate Number(4), Days(5),
+            // Destination(6), Unit Price(7), Total Price(8), Expenses(9), Paid Amount/Bill Amount(10), Payment Mode(11), Payment Date(12), EBM(13), Advance(14), Balance(15), Action(16 - conditional)
+            // We want to calculate totals for: Expenses (9), Paid Amount (10) and Balance (15)
+            var columns = [9, 10, 15]; // Expenses, Paid Amount, Balance
 
             columns.forEach(function (column) {
                 var total = api
