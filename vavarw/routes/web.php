@@ -43,6 +43,9 @@ Route::resource('fuel', 'fuelController');
 
 Route::resource('users', 'UsersController');
 
+// user sessions tracking
+Route::resource('user-sessions', 'UserSessionController')->only(['index','create','store']);
+
 Route::resource('models', 'ModelController');
 
 Route::resource('receptions', 'ReceptionsController');
