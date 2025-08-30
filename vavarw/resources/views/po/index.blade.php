@@ -63,6 +63,7 @@
                 <th>Margin</th>
                 @if(Auth::user()->id == 1)
                 <th>Inserted By</th>
+                <th>Created At</th>
                 <th>action</th>
                 @endif
             </tr>
@@ -96,7 +97,7 @@
                 <td>{{$roadmap->total_charges}}</td>
                 <td>{{number_format(($roadmap->ebm_number * $roadmap->amount) - ($roadmap->advance_cash + $roadmap->advance_fuel + $roadmap->total_charges))}}</td>
                 <td>{{number_format(($roadmap->ebm_number * $roadmap->selling_price) - ($roadmap->ebm_number * $roadmap->amount)) }}</td>
-
+                <td>{{ $roadmap->created_at }}</td>
                 @if(Auth::user()->id == 1)
                     <td>{{$roadmap->name}}</td>
                     <td class="text-left pl-4">
