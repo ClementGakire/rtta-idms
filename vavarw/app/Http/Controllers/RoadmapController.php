@@ -63,6 +63,7 @@ class RoadmapController extends Controller
         'roadmaps.status',
         'roadmaps.destination',
         'roadmaps.roadmap_number',
+        'roadmaps.created_at',
         'pos.amounts',
         'contractors.name as contractor',
         DB::raw('SUM(charges.amount) as total_charges'), // Sum of charges
@@ -87,6 +88,7 @@ class RoadmapController extends Controller
         'roadmaps.status',
         'roadmaps.destination',
         'roadmaps.roadmap_number',
+        'roadmaps.created_at',
         'pos.amounts',
         'contractors.name',
         'suppliers.name' // Include supplier's name in groupBy

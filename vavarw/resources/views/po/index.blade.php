@@ -141,6 +141,7 @@
                 <th></th>
                 <th></th>
                 <th></th>
+                <th></th>
                 @if(Auth::user()->role_id == 1)
                 <th></th>
                 <th></th>
