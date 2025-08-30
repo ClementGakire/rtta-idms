@@ -28,10 +28,14 @@
     <tbody>
       @foreach($sessions as $s)
       <tr>
-        <td>{{ $s->date }}</td>
-        <td>{{ $s->user->name }}</td>
-        <td>{{ \Carbon\Carbon::parse($s->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($s->end_time)->format('H:i') }}</td>
-        <td>{{ $s->notes }}</td>
+        <td>{{ $s->date ?? '' }}</td>
+        <td>{{ optional($s->user)->name ?? 'Unknown' }}</td>
+        <td>
+          {{ $s->start_time ? \Carbon\Carbon::parse($s->start_time)->format('H:i') : '-' }}
+           - 
+          {{ $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('H:i') : '-' }}
+        </td>
+        <td>{{ $s->notes ?? '' }}</td>
       </tr>
       @endforeach
     </tbody>
