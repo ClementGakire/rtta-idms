@@ -23,6 +23,7 @@
         <th>Username</th>
         <th>Session time</th>
         <th>Notes</th>
+  <th style="display:none">Updated At</th>
       </tr>
     </thead>
     <tbody>
@@ -36,6 +37,7 @@
           {{ $s->end_time ? \Carbon\Carbon::parse($s->end_time)->format('H:i') : '-' }}
         </td>
         <td>{{ $s->notes ?? '' }}</td>
+        <td style="display:none">{{ $s->updated_at ?? '' }}</td>
       </tr>
       @endforeach
     </tbody>
@@ -43,17 +45,7 @@
 </div>
 @endsection
 
-    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.flash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script>
-
+  <!-- DataTables scripts are centralized in layouts/app.blade.php -->
     <script>
       // global table var so cloned-header script can access it
       var sessionsTable = null;
@@ -93,7 +85,11 @@
             sessionsTable = $('#sessions-table').DataTable( {
               orderCellsTop: true,
               fixedHeader: true,
-              "order": [[0, "desc"]],
+              // order by the hidden "Updated At" column (last column) desc
+              "order": [[4, "desc"]],
+              columnDefs: [
+                { targets: [4], visible: false, searchable: false }
+              ],
               dom: "<'row'<'col-sm-3'l><'col-sm-6 text-center'B><'col-sm-3'f>>" +
                    "<'row'<'col-sm-12'tr>>" +
                    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
@@ -128,5 +124,4 @@
             } );
         } );
       } catch (e) { console && console.warn && console.warn('Header clone failed', e); }
-    </script>
-    </script>
+  </script>
