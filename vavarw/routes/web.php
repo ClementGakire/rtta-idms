@@ -14,6 +14,8 @@ Route::resource('payments', 'PaymentController');
 Route::get('po/export', 'RoadmapController@export');
 
 Route::resource('po', 'RoadmapController');
+// Custom action: mark a PO/operation as Closed
+Route::post('po/{id}/close', 'RoadmapController@close');
 
 Route::resource('roadmap', 'PoController');
 

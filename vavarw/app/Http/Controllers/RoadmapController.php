@@ -275,4 +275,24 @@ return view('po.index')->with('roadmaps', $roadmaps);
         return redirect('/po')->with('success','operation deleted');
     }
     
+    /**
+     * Mark a roadmap/PO as Closed.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function close($id)
+    {
+        $roadmap = Roadmap::findOrFail($id);
+
+        // Optional: add authorization check here (e.g. only admins)
+        // if (auth()->user()->role_id != 1) {
+        //     abort(403);
+        // }
+
+        $roadmap->status = 'Closed';
+        $roadmap->save();
+
+        return redirect('/po')->with('success', 'Operation marked as Closed');
+    }
 }

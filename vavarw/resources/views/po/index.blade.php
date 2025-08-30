@@ -94,7 +94,21 @@
                 <td>{{$roadmap->operator}}</td>
                 <td>{{$roadmap->destination}}</td>
                 <td>{{$roadmap->odometer_count}}</td>
-                <td class="text-warning">{{$roadmap->status}}</td>
+                <td>
+                    @if(isset($roadmap->status) && $roadmap->status === 'Closed')
+                        <span class="badge badge-secondary" style="padding:6px 10px;">Closed</span>
+                    @elseif(isset($roadmap->status) && $roadmap->status === 'Ongoing')
+                        <span class="badge badge-info" style="padding:6px 10px;">Ongoing</span>
+                        @if(Auth::user()->role_id == 1)
+                            <form action="/po/{{ $roadmap->id }}/close" method="POST" style="display:inline;margin-left:6px;">
+                                {{ csrf_field() }}
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Close</button>
+                            </form>
+                        @endif
+                    @else
+                        <span class="badge badge-warning" style="padding:6px 10px;">{{ $roadmap->status ?? 'Unknown' }}</span>
+                    @endif
+                </td>
                 <td>{{$roadmap->total_charges}}</td>
                 <td>{{number_format(($roadmap->ebm_number * $roadmap->amount) - ($roadmap->advance_cash + $roadmap->advance_fuel + $roadmap->total_charges))}}</td>
                 <td>{{number_format(($roadmap->ebm_number * $roadmap->selling_price) - ($roadmap->ebm_number * $roadmap->amount)) }}</td>
