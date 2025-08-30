@@ -61,9 +61,10 @@
                 <th>Other Expenses</th>
                 <th>Balance to the supplier</th>
                 <th>Margin</th>
+                <th>Inserted On</th>
                 @if(Auth::user()->id == 1)
                 <th>Inserted By</th>
-                <th>Created At</th>
+                
                 <th>action</th>
                 @endif
             </tr>
