@@ -133,26 +133,18 @@ class ReceptionsController extends Controller
      */
     public function show($id)
     {
-        $reception = DB::table('receptions')
-            ->leftJoin('roadmaps', 'receptions.roadmap_number', '=', 'roadmaps.roadmap_number')
-            ->leftJoin('contractors', 'roadmaps.contractor_id', '=', 'contractors.id')
-            ->leftJoin('cars', 'roadmaps.car_id', '=', 'cars.id')
-            ->select(
-                'receptions.*',
-                'roadmaps.roadmap_number',
-                'roadmaps.purchase_order',
-                'roadmaps.institution',
-                'contractors.name as contractor_name',
-                'cars.plate_number'
-            )
-            ->where('receptions.id', $id)
-            ->first();
-    
+        // Fetch the reception record using the Eloquent model so we reliably
+        // get the stored `files` column. The previous DB join query could
+        // fail to return a row in some environments (causing a 404) when
+        // related join keys differ. For the attachments view we only need
+        // the reception record itself.
+        $reception = Reception::find($id);
+
         if (!$reception) {
             abort(404);
         }
-    
-        $files = $reception->files ? explode("|", $reception->files) : [];
+
+        $files = $reception->files ? array_filter(array_map('trim', explode('|', $reception->files))) : [];
         return view('receptions.show', compact('reception', 'files'));
     }
     
