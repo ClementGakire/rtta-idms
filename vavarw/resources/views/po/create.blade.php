@@ -84,12 +84,12 @@
 
                       <div class="form-group">
                         <label for="start_date">Starting Date</label>
-                        <input type="date" name="created_on" id="" class="form-control" required min="{{ date('Y-m-d') }}">
+                        <input type="date" name="created_on" id="start_date" class="form-control" required>
                       </div>
 
                       <div class="form-group">
                         <label for="end_date">Ending Date</label>
-                        <input type="date" name="received_on" id="" class="form-control" required min="{{ date('Y-m-d') }}">
+                        <input type="date" name="received_on" id="end_date" class="form-control" required>
                       </div>
 
                       
