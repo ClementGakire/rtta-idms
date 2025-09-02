@@ -10,17 +10,7 @@
       <dd class="col-sm-9">
         @if(!empty($files))
           @foreach($files as $f)
-            @php
-              $publicPath = public_path('images/' . $f);
-              $storagePath = storage_path('app/public/images/' . $f);
-            @endphp
-            @if(file_exists($publicPath) && is_file($publicPath))
-              <a href="{{ asset('images/' . $f) }}" target="_blank">{{ $f }}</a><br/>
-            @elseif(file_exists($storagePath) && is_file($storagePath))
-              <a href="{{ asset('storage/images/' . $f) }}" target="_blank">{{ $f }}</a><br/>
-            @else
-              <span class="text-warning">{{ $f }} — Missing file</span><br/>
-            @endif
+            <a href="{{ asset('images/' . $f) }}" target="_blank">{{ $f }}</a><br/>
           @endforeach
         @else
           <span class="text-danger">No files</span>

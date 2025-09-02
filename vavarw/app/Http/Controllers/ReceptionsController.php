@@ -9,6 +9,7 @@ use App\Institution;
 use App\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReceptionsController extends Controller
 {
@@ -89,19 +90,43 @@ class ReceptionsController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $images = array();
-        if($files = $request->file('files')){
-            foreach($files as $file){
-                $name=$file->getClientOriginalName();
-                $file->move(public_path('images'), $name);
-                $images[] = $name;
+        // Validate uploaded files first (each file limited to ~2MB here)
+        $this->validate($request, [
+            'files' => 'nullable',
+            'files.*' => 'file|max:2048'
+        ]);
+
+        $images = [];
+        if ($request->hasFile('files')) {
+            $destination = public_path('images');
+            if (!is_dir($destination)) {
+                // attempt to create directory with reasonable permissions
+                try {
+                    mkdir($destination, 0755, true);
+                } catch (\Exception $e) {
+                    Log::error('Failed to create images directory: ' . $e->getMessage());
+                }
+            }
+
+            foreach ($request->file('files') as $file) {
+                if (!$file->isValid()) {
+                    Log::warning('Uploaded file reported as invalid', ['name' => $file->getClientOriginalName()]);
+                    continue;
+                }
+
+                // generate a safer unique filename to avoid collisions
+                $original = $file->getClientOriginalName();
+                $safe = preg_replace('/[^A-Za-z0-9\.\-_]/', '_', $original);
+                $name = time() . '_' . uniqid() . '_' . $safe;
+
+                try {
+                    $file->move($destination, $name);
+                    $images[] = $name;
+                } catch (\Exception $e) {
+                    Log::error('Failed to move uploaded file', ['file' => $original, 'error' => $e->getMessage()]);
+                }
             }
         }
-
-        $this->validate($request, [
-            'files' => 'nullable|max:1999'
-        ]);
 
         $reception = new Reception;
         $reception->user_id = Auth()->user()->id;
@@ -116,7 +141,7 @@ class ReceptionsController extends Controller
         $reception->destination = $request->input('destination');
         $reception->plate_number = $request->input('plate_number');
         $reception->ebm = $request->input('ebm');
-        $reception->files = implode("|", $images);
+    $reception->files = implode("|", $images);
         $reception->messenger = $request->input('messenger');
         $reception->messenger_phone = $request->input('messenger_phone');
         $reception->supplier = $request->input('supplier');
@@ -133,18 +158,26 @@ class ReceptionsController extends Controller
      */
     public function show($id)
     {
-        // Fetch the reception record using the Eloquent model so we reliably
-        // get the stored `files` column. The previous DB join query could
-        // fail to return a row in some environments (causing a 404) when
-        // related join keys differ. For the attachments view we only need
-        // the reception record itself.
-        $reception = Reception::find($id);
-
+        $reception = DB::table('receptions')
+            ->leftJoin('roadmaps', 'receptions.roadmap_number', '=', 'roadmaps.roadmap_number')
+            ->leftJoin('contractors', 'roadmaps.contractor_id', '=', 'contractors.id')
+            ->leftJoin('cars', 'roadmaps.car_id', '=', 'cars.id')
+            ->select(
+                'receptions.*',
+                'roadmaps.roadmap_number',
+                'roadmaps.purchase_order',
+                'roadmaps.institution',
+                'contractors.name as contractor_name',
+                'cars.plate_number'
+            )
+            ->where('receptions.id', $id)
+            ->first();
+    
         if (!$reception) {
             abort(404);
         }
-
-        $files = $reception->files ? array_filter(array_map('trim', explode('|', $reception->files))) : [];
+    
+        $files = $reception->files ? explode("|", $reception->files) : [];
         return view('receptions.show', compact('reception', 'files'));
     }
     
@@ -175,19 +208,41 @@ class ReceptionsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
-        $images = array();
-        if($files = $request->file('files')){
-            foreach($files as $file){
-                $name = $file->getClientOriginalName();
-                $file->move(public_path('images'), $name);
-                $images[] = $name;
+        // Validate uploaded files first
+        $this->validate($request, [
+            'files' => 'nullable',
+            'files.*' => 'file|max:2048'
+        ]);
+
+        $images = [];
+        if ($request->hasFile('files')) {
+            $destination = public_path('images');
+            if (!is_dir($destination)) {
+                try {
+                    mkdir($destination, 0755, true);
+                } catch (\Exception $e) {
+                    Log::error('Failed to create images directory: ' . $e->getMessage());
+                }
+            }
+
+            foreach ($request->file('files') as $file) {
+                if (!$file->isValid()) {
+                    Log::warning('Uploaded file reported as invalid', ['name' => $file->getClientOriginalName()]);
+                    continue;
+                }
+
+                $original = $file->getClientOriginalName();
+                $safe = preg_replace('/[^A-Za-z0-9\.\-_]/', '_', $original);
+                $name = time() . '_' . uniqid() . '_' . $safe;
+
+                try {
+                    $file->move($destination, $name);
+                    $images[] = $name;
+                } catch (\Exception $e) {
+                    Log::error('Failed to move uploaded file', ['file' => $original, 'error' => $e->getMessage()]);
+                }
             }
         }
-
-        $this->validate($request, [
-            'files' => 'nullable|max:1999'
-        ]);
 
         $reception = Reception::findOrFail($id);
         $reception->user_id = Auth()->user()->id;
@@ -202,7 +257,13 @@ class ReceptionsController extends Controller
         $reception->destination = $request->input('destination');
         $reception->plate_number = $request->input('plate_number');
         $reception->ebm = $request->input('ebm');
-        $reception->files = implode("|", $images);
+        // Preserve any existing files if no new files were uploaded
+        if (!empty($images)) {
+            // append to existing files if any
+            $existing = $reception->files ? explode('|', $reception->files) : [];
+            $all = array_filter(array_merge($existing, $images));
+            $reception->files = implode('|', $all);
+        }
         $reception->messenger = $request->input('messenger');
         $reception->messenger_phone = $request->input('messenger_phone');
         $reception->supplier = $request->input('supplier');
