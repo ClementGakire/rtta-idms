@@ -120,7 +120,7 @@ class ReceptionsController extends Controller
                 $name = time() . '_' . uniqid() . '_' . $safe;
 
                 try {
-                    $file->move($destination, $name);
+                        $file->move('images', $name);
                     $images[] = $name;
                 } catch (\Exception $e) {
                     Log::error('Failed to move uploaded file', ['file' => $original, 'error' => $e->getMessage()]);
@@ -236,7 +236,7 @@ class ReceptionsController extends Controller
                 $name = time() . '_' . uniqid() . '_' . $safe;
 
                 try {
-                    $file->move($destination, $name);
+                        $file->move('images', $name);
                     $images[] = $name;
                 } catch (\Exception $e) {
                     Log::error('Failed to move uploaded file', ['file' => $original, 'error' => $e->getMessage()]);
