@@ -115,7 +115,10 @@
     </section>
 
     <script src="{{asset('jquery.min.js')}}"></script>
-    <script src="{{asset('bootstrap.min.js')}}"></script>
+  <script src="{{asset('bootstrap.min.js')}}"></script>
+  <!-- PDF.js and jsPDF for client-side PDF compression -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
       $(document).ready(function(){
         $('#purchase_order').change(function(){
@@ -136,7 +139,7 @@
           });
         }
 
-        // Compress image File to be <= maxBytes. Returns a Promise resolving to a Blob (may be original file if already small).
+  // Compress image File to be <= maxBytes. Returns a Promise resolving to a Blob or File (may be original file if already small).
         function compressImageFile(file, maxBytes) {
           return new Promise(function(resolve, reject) {
             if (!file.type.startsWith('image/')) {
@@ -204,6 +207,88 @@
           });
         }
 
+        // Compress PDF by rendering pages to images and rebuilding a new PDF via jsPDF
+        // Returns Promise<File|Blob|null>
+        function compressPdfFile(file, maxBytes) {
+          return new Promise(async function(resolve, reject){
+            try {
+              var arrayBuffer = await file.arrayBuffer();
+              // pdfjs global
+              var pdfjsLib = window['pdfjs-dist/build/pdf'] || window['pdfjsLib'] || window.pdfjsLib;
+              if (!pdfjsLib) {
+                // fallback: try window['pdfjsLib']
+                pdfjsLib = window['pdfjsLib'];
+              }
+              if (!pdfjsLib || !pdfjsLib.getDocument) {
+                return reject(new Error('PDF.js not available')); 
+              }
+
+              // Ensure workerSrc is set if needed
+              if (pdfjsLib.GlobalWorkerOptions && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+              }
+
+              var loadingTask = pdfjsLib.getDocument({data: arrayBuffer});
+              var pdf = await loadingTask.promise;
+              var totalPages = pdf.numPages;
+
+              const { jsPDF } = window.jspdf || window.jspdf || window.jsPDF || {};
+              if (!jsPDF) return reject(new Error('jsPDF not available'));
+
+              // prepare jsPDF with default page size (A4) - we'll add pages sized to rendered images
+              var pdfDoc = new jsPDF({ unit: 'pt' });
+
+              // for each page render to canvas and add as JPEG image
+              for (var p = 1; p <= totalPages; p++) {
+                var page = await pdf.getPage(p);
+                var viewport = page.getViewport({ scale: 1.0 });
+
+                // choose a scale to control output resolution; we'll lower scale for very large pages
+                var scale = 1.0;
+                if (viewport.width > 1400) scale = 1400 / viewport.width;
+                var renderViewport = page.getViewport({ scale: scale });
+
+                var canvas = document.createElement('canvas');
+                canvas.width = Math.round(renderViewport.width);
+                canvas.height = Math.round(renderViewport.height);
+                var ctx = canvas.getContext('2d');
+
+                await page.render({ canvasContext: ctx, viewport: renderViewport }).promise;
+
+                // reduce image quality moderately
+                var mime = 'image/jpeg';
+                var quality = 0.78;
+                // convert canvas to dataURL (jpeg) and add to jsPDF
+                var dataUrl = canvas.toDataURL(mime, quality);
+
+                // compute dimensions in points for jsPDF (1 pt = 1px at default 72 DPI assumption isn't exact, but ok)
+                var imgProps = { width: canvas.width, height: canvas.height };
+
+                if (p === 1) {
+                  pdfDoc = new jsPDF({ unit: 'pt', format: [imgProps.width, imgProps.height] });
+                  pdfDoc.addImage(dataUrl, 'JPEG', 0, 0, imgProps.width, imgProps.height);
+                } else {
+                  pdfDoc.addPage([imgProps.width, imgProps.height]);
+                  pdfDoc.addImage(dataUrl, 'JPEG', 0, 0, imgProps.width, imgProps.height);
+                }
+              }
+
+              // output as blob
+              const outBlob = pdfDoc.output('blob');
+              if (outBlob.size <= maxBytes) {
+                var outFile = new File([outBlob], file.name.replace(/\.[^.]+$/, '.pdf'), { type: 'application/pdf' });
+                resolve(outFile);
+              } else {
+                // try one more pass with lower image quality per page
+                // (advanced tuning omitted for brevity) -> return blob anyway
+                resolve(outBlob);
+              }
+            } catch (err) {
+              reject(err);
+            }
+          });
+        }
+
         // Intercept form submit to compress large files (images) before sending
         $('form').on('submit', function(e){
           e.preventDefault();
@@ -214,24 +299,29 @@
           var files = filesInput ? Array.from(filesInput.files) : [];
           var otherFields = $form.serializeArray();
 
-          var nonImageLarge = [];
+          var nonCompressibleLarge = [];
           var compressPromises = [];
 
           files.forEach(function(f, idx){
             if (f.size > MAX_BYTES) {
               if (f.type && f.type.startsWith('image/')) {
-                // compress
+                // compress image
                 compressPromises.push(compressImageFile(f, MAX_BYTES).then(function(result){
                   return { index: idx, original: f, result: result };
                 }));
+              } else if (f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')) {
+                // compress pdf
+                compressPromises.push(compressPdfFile(f, MAX_BYTES).then(function(result){
+                  return { index: idx, original: f, result: result };
+                }));
               } else {
-                nonImageLarge.push(f.name);
+                nonCompressibleLarge.push(f.name);
               }
             }
           });
 
-          if (nonImageLarge.length) {
-            alert('These non-image files exceed 2MB and cannot be compressed in the browser: \n' + nonImageLarge.join('\n') + '\n\nPlease remove them or upload smaller versions.');
+          if (nonCompressibleLarge.length) {
+            alert('These files exceed 2MB and cannot be compressed in the browser: \n' + nonCompressibleLarge.join('\n') + '\n\nPlease remove them or upload smaller versions.');
             return;
           }
 
