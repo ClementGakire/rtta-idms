@@ -63,6 +63,7 @@ class RoadmapController extends Controller
         'roadmaps.status',
         'roadmaps.destination',
         'roadmaps.roadmap_number',
+        'roadmaps.created_at',
         'pos.amounts',
         'contractors.name as contractor',
         DB::raw('SUM(charges.amount) as total_charges'), // Sum of charges
@@ -87,6 +88,7 @@ class RoadmapController extends Controller
         'roadmaps.status',
         'roadmaps.destination',
         'roadmaps.roadmap_number',
+        'roadmaps.created_at',
         'pos.amounts',
         'contractors.name',
         'suppliers.name' // Include supplier's name in groupBy
@@ -273,4 +275,24 @@ return view('po.index')->with('roadmaps', $roadmaps);
         return redirect('/po')->with('success','operation deleted');
     }
     
+    /**
+     * Mark a roadmap/PO as Closed.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function close($id)
+    {
+        $roadmap = Roadmap::findOrFail($id);
+
+        // Optional: add authorization check here (e.g. only admins)
+        // if (auth()->user()->role_id != 1) {
+        //     abort(403);
+        // }
+
+        $roadmap->status = 'Closed';
+        $roadmap->save();
+
+        return redirect('/po')->with('success', 'Operation marked as Closed');
+    }
 }

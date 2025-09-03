@@ -9,6 +9,7 @@ use App\Institution;
 use App\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReceptionsController extends Controller
 {
@@ -89,19 +90,43 @@ class ReceptionsController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $images = array();
-        if($files = $request->file('files')){
-            foreach($files as $file){
-                $name=$file->getClientOriginalName();
-                $file->move(public_path('images'), $name);
-                $images[] = $name;
+        // Validate uploaded files first (each file limited to ~2MB here)
+        $this->validate($request, [
+            'files' => 'nullable',
+            'files.*' => 'file|max:2048'
+        ]);
+
+        $images = [];
+        if ($request->hasFile('files')) {
+            $destination = public_path('images');
+            if (!is_dir($destination)) {
+                // attempt to create directory with reasonable permissions
+                try {
+                    mkdir($destination, 0755, true);
+                } catch (\Exception $e) {
+                    Log::error('Failed to create images directory: ' . $e->getMessage());
+                }
+            }
+
+            foreach ($request->file('files') as $file) {
+                if (!$file->isValid()) {
+                    Log::warning('Uploaded file reported as invalid', ['name' => $file->getClientOriginalName()]);
+                    continue;
+                }
+
+                // generate a safer unique filename to avoid collisions
+                $original = $file->getClientOriginalName();
+                $safe = preg_replace('/[^A-Za-z0-9\.\-_]/', '_', $original);
+                $name = time() . '_' . uniqid() . '_' . $safe;
+
+                try {
+                        $file->move('images', $name);
+                    $images[] = $name;
+                } catch (\Exception $e) {
+                    Log::error('Failed to move uploaded file', ['file' => $original, 'error' => $e->getMessage()]);
+                }
             }
         }
-
-        $this->validate($request, [
-            'files' => 'nullable|max:1999'
-        ]);
 
         $reception = new Reception;
         $reception->user_id = Auth()->user()->id;
@@ -116,7 +141,7 @@ class ReceptionsController extends Controller
         $reception->destination = $request->input('destination');
         $reception->plate_number = $request->input('plate_number');
         $reception->ebm = $request->input('ebm');
-        $reception->files = implode("|", $images);
+    $reception->files = implode("|", $images);
         $reception->messenger = $request->input('messenger');
         $reception->messenger_phone = $request->input('messenger_phone');
         $reception->supplier = $request->input('supplier');
@@ -183,19 +208,41 @@ class ReceptionsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
-        $images = array();
-        if($files = $request->file('files')){
-            foreach($files as $file){
-                $name = $file->getClientOriginalName();
-                $file->move(public_path('images'), $name);
-                $images[] = $name;
+        // Validate uploaded files first
+        $this->validate($request, [
+            'files' => 'nullable',
+            'files.*' => 'file|max:2048'
+        ]);
+
+        $images = [];
+        if ($request->hasFile('files')) {
+            $destination = public_path('images');
+            if (!is_dir($destination)) {
+                try {
+                    mkdir($destination, 0755, true);
+                } catch (\Exception $e) {
+                    Log::error('Failed to create images directory: ' . $e->getMessage());
+                }
+            }
+
+            foreach ($request->file('files') as $file) {
+                if (!$file->isValid()) {
+                    Log::warning('Uploaded file reported as invalid', ['name' => $file->getClientOriginalName()]);
+                    continue;
+                }
+
+                $original = $file->getClientOriginalName();
+                $safe = preg_replace('/[^A-Za-z0-9\.\-_]/', '_', $original);
+                $name = time() . '_' . uniqid() . '_' . $safe;
+
+                try {
+                        $file->move('images', $name);
+                    $images[] = $name;
+                } catch (\Exception $e) {
+                    Log::error('Failed to move uploaded file', ['file' => $original, 'error' => $e->getMessage()]);
+                }
             }
         }
-
-        $this->validate($request, [
-            'files' => 'nullable|max:1999'
-        ]);
 
         $reception = Reception::findOrFail($id);
         $reception->user_id = Auth()->user()->id;
@@ -210,7 +257,13 @@ class ReceptionsController extends Controller
         $reception->destination = $request->input('destination');
         $reception->plate_number = $request->input('plate_number');
         $reception->ebm = $request->input('ebm');
-        $reception->files = implode("|", $images);
+        // Preserve any existing files if no new files were uploaded
+        if (!empty($images)) {
+            // append to existing files if any
+            $existing = $reception->files ? explode('|', $reception->files) : [];
+            $all = array_filter(array_merge($existing, $images));
+            $reception->files = implode('|', $all);
+        }
         $reception->messenger = $request->input('messenger');
         $reception->messenger_phone = $request->input('messenger_phone');
         $reception->supplier = $request->input('supplier');

@@ -61,8 +61,10 @@
                 <th>Other Expenses</th>
                 <th>Balance to the supplier</th>
                 <th>Margin</th>
+                <th>Inserted On</th>
                 @if(Auth::user()->id == 1)
                 <th>Inserted By</th>
+                
                 <th>action</th>
                 @endif
             </tr>
@@ -92,11 +94,25 @@
                 <td>{{$roadmap->operator}}</td>
                 <td>{{$roadmap->destination}}</td>
                 <td>{{$roadmap->odometer_count}}</td>
-                <td class="text-warning">{{$roadmap->status}}</td>
+                <td>
+                    @if(isset($roadmap->status) && $roadmap->status === 'Closed')
+                        <span class="badge badge-secondary" style="padding:6px 10px;">Closed</span>
+                    @elseif(isset($roadmap->status) && $roadmap->status === 'Ongoing')
+                        <span class="badge badge-info" style="padding:6px 10px;">Ongoing</span>
+                        @if(Auth::user()->role_id == 1)
+                            <form action="/po/{{ $roadmap->id }}/close" method="POST" style="display:inline;margin-left:6px;">
+                                {{ csrf_field() }}
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Close</button>
+                            </form>
+                        @endif
+                    @else
+                        <span class="badge badge-warning" style="padding:6px 10px;">{{ $roadmap->status ?? 'Unknown' }}</span>
+                    @endif
+                </td>
                 <td>{{$roadmap->total_charges}}</td>
                 <td>{{number_format(($roadmap->ebm_number * $roadmap->amount) - ($roadmap->advance_cash + $roadmap->advance_fuel + $roadmap->total_charges))}}</td>
                 <td>{{number_format(($roadmap->ebm_number * $roadmap->selling_price) - ($roadmap->ebm_number * $roadmap->amount)) }}</td>
-
+                <td>{{ $roadmap->created_at }}</td>
                 @if(Auth::user()->id == 1)
                     <td>{{$roadmap->name}}</td>
                     <td class="text-left pl-4">
@@ -117,6 +133,7 @@
         	
         <tfoot>
             <tr>
+                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -179,7 +196,7 @@
       function (settings, data, dataIndex) {
           var min = $('.min').datepicker("getDate");
           var max = $('#max').datepicker("getDate");
-          var startDate = new Date(data[4]);
+          var startDate = new Date(data[5]);
           if (min == null && max == null) { return true; }
           if (min == null && startDate <= max) { return true;}
           if(max == null && startDate >= min) {return true;}
