@@ -368,9 +368,8 @@
               processData: false,
               contentType: false,
               success: function(resp){
-                // on success, try to follow typical form behavior: reload or redirect if server sends Location header
-                // simplest: reload page to show created resource or redirect to index
-                location.reload();
+                // on success redirect to index page (controller usually redirects to index)
+                window.location.href = "{{ url('receptions') }}";
               },
               error: function(xhr){
                 var msg = 'Upload failed. Please try again.';
