@@ -37,7 +37,7 @@
                   <th>Operator</th>
                   <th>Destination</th>
                   <th>Plate</th>
-                  <th>EBM</th>
+                  <th>EBM #</th>
                   <th>Driver</th>
                   <th>Driver's Phone No</th>
                   <th>Messenger</th>
