@@ -90,9 +90,7 @@
                           <label for="bank_account">Bank Account</label>
                           <select class="form-control" id="bank_account" name="bank_account">
                             <option disabled selected>Choose Bank Account...</option>
-                            <option value="Bank of Kigali - 11234343434">Bank of Kigali - 11234343434</option>
-                            <option value="Equity Bank - 2211223344">Equity Bank - 2211223344</option>
-                            <option value="GTBank - 5566778899">GTBank - 5566778899</option>
+                            <option value="Bank of Kigali - 11234343434">Bank of Kigali - 100085862477</option>
                           </select>
                         </div>
 
