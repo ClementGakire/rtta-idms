@@ -62,7 +62,7 @@
                 <th>Balance to the supplier</th>
                 <th>Margin</th>
                 <th>Inserted On</th>
-                @if(Auth::user()->id == 1)
+                @if(Auth::user()->id == 1 || Str::contains(Auth::user()->role_id, 'Ongoing Operations'))
                 <th>Inserted By</th>
                 
                 <th>action</th>
@@ -73,7 +73,7 @@
         <tbody style="font-size: 12px;">
 
     @foreach($roadmaps as $roadmap)
-        @if($roadmap->status == 'Ongoing' || Auth::user()->role_id == 1)
+        @if($roadmap->status == 'Ongoing' || Auth::user()->role_id == 1 || Str::contains(Auth::user()->role_id, 'Ongoing Operations'))
             <tr>
                 <th>{{$roadmap->purchase_order}}</th>
                 <th>{{$roadmap->roadmap_number}}</th>
@@ -99,7 +99,7 @@
                         <span class="badge badge-secondary" style="padding:6px 10px;">Closed</span>
                     @elseif(isset($roadmap->status) && $roadmap->status === 'Ongoing')
                         <span class="badge badge-info" style="padding:6px 10px;">Ongoing</span>
-                        @if(Auth::user()->role_id == 1)
+                        @if(Auth::user()->role_id == 1 || Str::contains(Auth::user()->role_id, 'Ongoing Operations'))
                             <form action="/po/{{ $roadmap->id }}/close" method="POST" style="display:inline;margin-left:6px;">
                                 {{ csrf_field() }}
                                 <button type="submit" class="btn btn-sm btn-outline-primary">Close</button>
@@ -113,7 +113,7 @@
                 <td>{{number_format(($roadmap->ebm_number * $roadmap->amount) - ($roadmap->advance_cash + $roadmap->advance_fuel + $roadmap->total_charges))}}</td>
                 <td>{{number_format(($roadmap->ebm_number * $roadmap->selling_price) - ($roadmap->ebm_number * $roadmap->amount)) }}</td>
                 <td>{{ $roadmap->created_at }}</td>
-                @if(Auth::user()->id == 1)
+                @if(Auth::user()->id == 1 || Str::contains(Auth::user()->role_id, 'Ongoing Operations'))
                     <td>{{$roadmap->name}}</td>
                     <td class="text-left pl-4">
                         <a href="/po/{{$roadmap->id}}">
@@ -157,7 +157,7 @@
                 <th></th>
                 <th></th>
                 <th></th>
-                @if(Auth::user()->role_id == 1)
+                @if(Auth::user()->role_id == 1 || Str::contains(Auth::user()->role_id, 'Ongoing Operations'))
                 <th></th>
                 <th></th>
                 @endif
