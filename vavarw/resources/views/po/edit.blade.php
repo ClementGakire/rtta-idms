@@ -2,7 +2,7 @@
 @extends('layouts.app')
 
 @section('content')
-@if(Auth::user()->id == 1 || Auth::user()->role_id == 'Roadmap Deployment')
+@if(Auth::user()->role_id == 1 || Str::contains(Auth::user()->role_id, 'Ongoing Operations'))
 	
 	
 
