@@ -2,6 +2,9 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    use Illuminate\Support\Str;
+@endphp
 @if(Auth::user()->role_id == 1 || Str::contains(Auth::user()->role_id, 'Ongoing Operations'))
 	
 	
