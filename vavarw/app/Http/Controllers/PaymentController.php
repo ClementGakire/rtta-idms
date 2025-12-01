@@ -77,7 +77,7 @@ class PaymentController extends Controller
             }
         }
         $this->validate($request, [
-            'voucherNo' => 'required',
+            'voucherNo' => 'required|unique:payments,voucherNo',
             'institution' => 'required',
             'files' => 'nullable|max:1999',
         ]);
@@ -132,6 +132,11 @@ class PaymentController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $this->validate($request, [
+            'voucherNo' => 'required|unique:payments,voucherNo,' . $id,
+            'institution' => 'required',
+        ]);
+        
         $payment =  Payment::find($id);
         $payment->voucherNo = $request->input('voucherNo');
         $payment->institution = $request->input('institution');
