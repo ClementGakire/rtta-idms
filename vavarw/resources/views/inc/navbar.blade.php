@@ -8,7 +8,7 @@
           <div class="row">
             <!-- sidebar -->
             <div class="col-xl-2 col-lg-3 col-md-4 sidebar fixed-top" style="overflow-y: scroll; padding-right: 15px;">
-              <a href="https://vavatransport.rw/" class="navbar-brand text-white d-block mx-auto text-center py-3 mb-4 bottom-border" target="_blank" style="background: black;">
+              <a href="#" class="navbar-brand text-white d-block mx-auto text-center py-3 mb-4 bottom-border" style="background: black;">
                   <!--<img src="{{ asset('images/Logo-Vector.png') }}" alt="Brand Image" width="150" />-->
                   RTTA
               </a>
