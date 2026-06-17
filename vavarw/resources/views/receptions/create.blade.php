@@ -116,11 +116,15 @@
 
     <script src="{{asset('jquery.min.js')}}"></script>
   <script src="{{asset('bootstrap.min.js')}}"></script>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <!-- PDF.js and jsPDF for client-side PDF compression -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
       $(document).ready(function(){
+        $('select[name="roadmap_number"]').select2({ placeholder: 'Search roadmap number...', width: '100%' });
+
         $('#purchase_order').change(function(){
           // optionally fill roadmap_number when purchase_order selected
           var po = $(this).val();

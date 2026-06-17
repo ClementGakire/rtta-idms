@@ -80,9 +80,14 @@
   src="https://code.jquery.com/jquery-3.4.1.min.js"
   integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
   crossorigin="anonymous"></script>
+                          <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+                          <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
                           <script type="text/javascript">
     jQuery(document).ready(function ()
     {
+            jQuery('select[name="institution"]').select2({ placeholder: 'Choose institution', width: '100%' });
+            jQuery('select[name="invoiceNumber"]').select2({ placeholder: 'Search invoice...', width: '100%' });
+
             jQuery('select[name="institution"]').on('change',function(){
                var customerID = jQuery(this).val();
                if(customerID)
@@ -94,10 +99,11 @@
                      success:function(data)
                      {
                         console.log(data);
-                        jQuery('select[name="invoiceNumber"]').empty();
+                        jQuery('select[name="invoiceNumber"]').empty().append('<option></option>');
                         jQuery.each(data, function(key,value){
                            $('select[name="invoiceNumber"]').append('<option value="'+ key +'">'+ key + '</option>');
                         });
+                        jQuery('select[name="invoiceNumber"]').trigger('change.select2');
                      }
                   });
                }
